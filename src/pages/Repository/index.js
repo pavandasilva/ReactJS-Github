@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
+import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 
-import { Loading, Owner, IssueList } from './styles';
+import { Loading, Owner, IssueList, Pagination } from './styles';
 import api from '../../services/api';
 import Container from '../../components/Container';
 
@@ -19,6 +20,7 @@ class Repository extends Component {
     repository: {},
     issues: [],
     loading: true,
+    page: 1,
   };
 
   async componentDidMount() {
@@ -30,8 +32,9 @@ class Repository extends Component {
       api.get(`/repos/${repoName}`),
       api.get(`/repos/${repoName}/issues`, {
         params: {
-          state: 'open',
+          state: 'all',
           per_page: 5,
+          page: 1,
         },
       }),
     ]);
@@ -41,13 +44,37 @@ class Repository extends Component {
       issues: issues.data,
       loading: false,
     });
-
-    console.log(repository);
-    console.log(issues);
   }
 
+  loadIssues = async () => {
+    const { match } = this.props;
+    const { page } = this.state;
+
+    const repoName = decodeURIComponent(match.params.repository);
+
+    const response = await api.get(`/repos/${repoName}/issues`, {
+      params: {
+        state: 'all',
+        per_page: 5,
+        page,
+      },
+    });
+
+    this.setState({ issues: response.data });
+  };
+
+  handlePagination = async type => {
+    const { page } = this.state;
+
+    await this.setState({
+      page: type === 'previous' ? page - 1 : page + 1,
+    });
+
+    this.loadIssues();
+  };
+
   render() {
-    const { repository, issues, loading } = this.state;
+    const { repository, issues, loading, page } = this.state;
 
     if (loading) {
       return <Loading>Carregando</Loading>;
@@ -79,6 +106,19 @@ class Repository extends Component {
             </li>
           ))}
         </IssueList>
+        <Pagination>
+          <button
+            type="button"
+            disabled={page === 1}
+            onClick={() => this.handlePagination('previous')}
+          >
+            <FaArrowLeft />
+          </button>
+          <span>Página {page}</span>
+          <button type="button" onClick={() => this.handlePagination('next')}>
+            <FaArrowRight />
+          </button>
+        </Pagination>
       </Container>
     );
   }
