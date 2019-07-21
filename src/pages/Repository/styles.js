@@ -105,15 +105,17 @@ export const IssueList = styled.ul`
 export const Pagination = styled.div`
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
   margin-top: 20px;
 
   button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: #7159c1;
     color: white;
-    height: 30px;
-    width: 30px;
     border-radius: 5px;
+    padding: 5px;
   }
 
   span {
@@ -121,5 +123,30 @@ export const Pagination = styled.div`
     font-size: 16px;
     margin-left: 10px;
     margin-right: 10px;
+  }
+`;
+
+export const FilterList = styled.div`
+  display: flex;
+  margin-top: 20px;
+  justify-content: center;
+
+  button {
+    background: white;
+    border: 1px #7159c1 solid;
+    border-radius: 5px;
+    margin-right: 10px;
+    padding: 5px;
+    color: #999;
+
+    &:nth-child(${props => props.active + 1}) {
+      background: #7159c1;
+      color: white;
+    }
+
+    &:hover {
+      background: #7159c1;
+      color: white;
+    }
   }
 `;
